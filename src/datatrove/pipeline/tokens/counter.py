@@ -49,8 +49,9 @@ class TokensCounter(PipelineStep):
         Returns:
 
         """
-        for document in data:
-            count = len(self.tokenizer.encode(document.text).ids)
+        from tqdm import tqdm
+        for _, document in tqdm(enumerate(data)):
+            count = len(self.tokenizer.encode(document.text))
             self.stat_update("tokens", value=count)
             document.metadata["token_count"] = count
             yield document
@@ -58,9 +59,11 @@ class TokensCounter(PipelineStep):
     @property
     def tokenizer(self) -> "Tokenizer":
         if not self._tokenizer:
-            from tokenizers import Tokenizer
+            # from tokenizers import Tokenizer
+            from transformers import AutoTokenizer, LlamaTokenizerFast
 
-            self._tokenizer = Tokenizer.from_pretrained(self.tokenizer_name)
+            # self._tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name)
+            self._tokenizer = LlamaTokenizerFast.from_pretrained(self.tokenizer_name)
         return self._tokenizer
 
 
